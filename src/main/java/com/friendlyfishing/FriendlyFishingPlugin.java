@@ -1,4 +1,4 @@
-package com.example;
+package com.friendlyfishing;
 
 import com.google.inject.Provides;
 import javax.inject.Inject;
@@ -11,29 +11,38 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.ui.overlay.OverlayManager;
 
 @Slf4j
 @PluginDescriptor(
-	name = "Example"
+	name = "Friendly Fishing"
 )
-public class ExamplePlugin extends Plugin
+public class FriendlyFishingPlugin extends Plugin
 {
 	@Inject
 	private Client client;
 
 	@Inject
-	private ExampleConfig config;
+	private FriendlyFishingConfig config;
+
+	@Inject
+	private FriendlyFishingOverlay overlay;
+
+	@Inject
+	private OverlayManager overlayManager;
 
 	@Override
 	protected void startUp() throws Exception
 	{
-		log.info("Example started!");
+		overlayManager.add(overlay);
+		log.info("Friendly Fishing started!");
 	}
 
 	@Override
 	protected void shutDown() throws Exception
 	{
-		log.info("Example stopped!");
+		overlayManager.remove(overlay);
+		log.info("Friendly Fishing stopped!");
 	}
 
 	@Subscribe
@@ -46,8 +55,8 @@ public class ExamplePlugin extends Plugin
 	}
 
 	@Provides
-	ExampleConfig provideConfig(ConfigManager configManager)
+	FriendlyFishingConfig provideConfig(ConfigManager configManager)
 	{
-		return configManager.getConfig(ExampleConfig.class);
+		return configManager.getConfig(FriendlyFishingConfig.class);
 	}
 }
