@@ -4,8 +4,6 @@ import com.google.inject.Provides;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
-import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -13,12 +11,12 @@ import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
 
@@ -57,15 +55,6 @@ public class FriendlyFishingPlugin extends Plugin
 		log.info("Friendly Fishing stopped!");
 	}
 
-	@Subscribe
-	public void onGameStateChanged(GameStateChanged gameStateChanged)
-	{
-		if (gameStateChanged.getGameState() == GameState.LOGGED_IN)
-		{
-			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Example says " + config.greeting(), null);
-		}
-	}
-
 	@Provides
 	FriendlyFishingConfig provideConfig(ConfigManager configManager)
 	{
@@ -89,16 +78,16 @@ public class FriendlyFishingPlugin extends Plugin
 	// sizes
 	// <---- bias towards left
 	private final List<Size> sizes = Arrays.asList(
-			new Size(true, "", "Nothing Special", Color.YELLOW),
-			new Size(true, "", "Nothing Special", Color.YELLOW),
-			new Size(true, "", "Nothing Special", Color.YELLOW),
-			new Size(true, "", "Nothing Special", Color.YELLOW),
+			new Size(true, "", "", Color.YELLOW),
+			new Size(true, "", "", Color.YELLOW),
+			new Size(true, "", "", Color.YELLOW),
+			new Size(true, "", "", Color.YELLOW),
 			new Size(true, "Tiny", "Disappointing", Color.YELLOW),
-			new Size(true, "", "Nothing Special", Color.YELLOW),
+			new Size(true, "", "", Color.YELLOW),
 			new Size(true, "Huge", "What a catch!", Color.YELLOW),
-			new Size(true, "", "Nothing Special", Color.YELLOW),
+			new Size(true, "", "", Color.YELLOW),
 			new Size(true, "Whopper", "Ridiculous!", Color.YELLOW),
-			new Size(true, "", "Nothing Special", Color.YELLOW),
+			new Size(true, "", "", Color.YELLOW),
 			new Size(true, "Rotten", "This stinks!", Color.RED),
 			new Size(true, "GIANT", "Absolute unit.", Color.CYAN),
 			new Size(true, "GIANT", "Absolute unit.", Color.CYAN)
@@ -138,28 +127,21 @@ public class FriendlyFishingPlugin extends Plugin
 		}
 	}
 
-	// other
-	protected boolean cardsMode = true;
-	private String cardFaces = "A23456789JKQ";
-	private String cardSuits = "cdhs";
-
-
-	@Subscribe
-	public void onItemContainerChanged(ItemContainerChanged event) {
-
+	private void scanInventory() {
 		Widget inventoryWidget = client.getWidget(WidgetInfo.INVENTORY);
-
 		Collection<WidgetItem> items = inventoryWidget.getWidgetItems();
+		HashMap<Integer, Boolean> slotsIndexes = new HashMap<Integer, Boolean>();
 
 		for (WidgetItem item: items) {
 
 			int itemId = item.getId();
-
 			if (itemId < 0 || !catchables.containsKey(itemId))
 			{
 				catches.remove(item.getIndex());
 				continue;
 			}
+
+			slotsIndexes.put(item.getIndex(), true);
 
 			Fish fish = new Fish(itemId, item.getIndex());   // make a new fish
 
@@ -171,23 +153,48 @@ public class FriendlyFishingPlugin extends Plugin
 			}
 
 			// cards modifier
-			if (cardsMode) {
+			if (config.cardsMode()) {
 				Random r = new Random();
+				// modifiers
+				String cardFaces = "A23456789JKQ";
 				char face = cardFaces.charAt(r.nextInt(cardFaces.length()));
+				String cardSuits = "cdhs";
 				char suit = cardSuits.charAt(r.nextInt(cardSuits.length()));
 				fish.size.label = ""+face+suit;
-				if (suit == 's' || suit == 'c') {
-					fish.size.color = Color.LIGHT_GRAY;
-				} else {
-					fish.size.color = Color.RED;
-				}
+				fish.size.color = Color.WHITE;
 			}
 
 			// put in the new one
 			catches.put(fish.index, fish);
-
-
 		}
 
+		// clear out the empties
+		// the widget does not return empty slots like it does for overlay
+		// so we have to do it this way
+		int i = 0;
+		while (i < 28) {
+			if (!slotsIndexes.containsKey(i)) {
+				log.info("Slot index" + i + " is empty, removing");
+				catches.remove(i);
+			}
+			i++;
 		}
 	}
+
+
+	@Subscribe
+	public void onItemContainerChanged(ItemContainerChanged event) {
+		scanInventory();
+	}
+
+	@Subscribe
+	public void onConfigChanged(final ConfigChanged event) {
+		// clear out the inventory log
+		int i = 0;
+		while (i < 28) {
+			catches.remove(i);
+			i++;
+		}
+		scanInventory();
+	}
+}

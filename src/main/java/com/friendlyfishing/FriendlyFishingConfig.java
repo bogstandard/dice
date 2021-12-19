@@ -7,13 +7,37 @@ import net.runelite.client.config.ConfigItem;
 @ConfigGroup("Friendly Fishing")
 public interface FriendlyFishingConfig extends Config
 {
+	// FISHING ROD
 	@ConfigItem(
-		keyName = "greeting",
-		name = "Welcome Greeting",
-		description = "The message to show to the user when they login"
+			keyName = "fishingRodName",
+			name = "Fishing Rod Name",
+			description = "Name your fishing rod."
 	)
-	default String greeting()
+	default String fishingRodName()
 	{
-		return "Hello";
+		return "Lucky Charmer";
+	}
+
+	// FLY FISHING ROD
+	@ConfigItem(
+		keyName = "flyFishingRodName",
+		name = "Fly Fishing Rod Name",
+		description = "Name your fly fishing rod."
+	)
+	default String flyFishingRodName()
+	{
+		return "Old Lucky";
+	}
+
+	// CARDS MODE
+	@ConfigItem(
+			position = 11,
+			keyName = "cardsMode",
+			name = "Cards Mode",
+			description = "Fish become random playing cards."
+	)
+	default boolean cardsMode()
+	{
+		return false;
 	}
 }
