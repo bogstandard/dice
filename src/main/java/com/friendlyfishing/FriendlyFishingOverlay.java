@@ -16,11 +16,6 @@ import net.runelite.client.util.ColorUtil;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
-
 @Slf4j
 public class FriendlyFishingOverlay extends WidgetItemOverlay
 {
@@ -67,13 +62,13 @@ public class FriendlyFishingOverlay extends WidgetItemOverlay
         final int y = bounds.y + 15;
         final String text = fish.size.label;
 
+        // standard behavior here
         graphics.setFont(FontManager.getRunescapeSmallFont());
         graphics.setColor(Color.BLACK);
         graphics.drawString(text, x, y);
         graphics.drawString(text, x + 2, y + 2);
         graphics.setColor(fish.size.color);
         graphics.drawString(text, x + 1, y + 1);
-
 
         // mouse is not over fish
         // done like this because detection is spotty

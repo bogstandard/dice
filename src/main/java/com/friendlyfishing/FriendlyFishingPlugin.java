@@ -19,9 +19,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
 
 @Slf4j
@@ -136,8 +134,14 @@ public class FriendlyFishingPlugin extends Plugin
 			this.index = index;
 			int ri = (int) ( Math.abs(Math.random() - Math.random()) * (1 + (sizes.size()-1)) ); // biased random towards 0
 			this.size = sizes.get(ri);
+
 		}
 	}
+
+	// other
+	protected boolean cardsMode = true;
+	private String cardFaces = "A23456789JKQ";
+	private String cardSuits = "cdhs";
 
 
 	@Subscribe
@@ -161,14 +165,28 @@ public class FriendlyFishingPlugin extends Plugin
 
 			if (catches.containsKey(fish.index)) {     // check we're not replacing an existing one
 				Fish existingFish = catches.get(fish.index);
-
-				if (fish.itemId != existingFish.itemId) { // it's the same, eg. Trout == Trout
-					catches.put(fish.index, fish); // else put in the new one
+				if (fish.itemId == existingFish.itemId) { // it's the same, eg. Trout == Trout
+					continue; // skip the rest
 				}
-
-			} else {
-				catches.put(fish.index, fish); // else put in the new one
 			}
+
+			// cards modifier
+			if (cardsMode) {
+				Random r = new Random();
+				char face = cardFaces.charAt(r.nextInt(cardFaces.length()));
+				char suit = cardSuits.charAt(r.nextInt(cardSuits.length()));
+				fish.size.label = ""+face+suit;
+				if (suit == 's' || suit == 'c') {
+					fish.size.color = Color.LIGHT_GRAY;
+				} else {
+					fish.size.color = Color.RED;
+				}
+			}
+
+			// put in the new one
+			catches.put(fish.index, fish);
+
+
 		}
 
 		}
