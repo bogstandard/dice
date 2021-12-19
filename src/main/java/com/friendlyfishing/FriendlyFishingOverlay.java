@@ -65,7 +65,7 @@ public class FriendlyFishingOverlay extends WidgetItemOverlay
         final Rectangle bounds = widgetItem.getCanvasBounds();
         final int x = bounds.x - 3;
         final int y = bounds.y + 15;
-        final String text = fish.size.label + "6♤";
+        final String text = fish.size.label;
 
         graphics.setFont(FontManager.getRunescapeSmallFont());
         graphics.setColor(Color.BLACK);
