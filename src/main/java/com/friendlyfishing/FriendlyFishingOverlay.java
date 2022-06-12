@@ -1,149 +1,81 @@
 package com.friendlyfishing;
 
-import com.google.inject.Inject;
-import com.sun.org.apache.xpath.internal.operations.Bool;
+import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.ItemID;
-import net.runelite.api.widgets.WidgetItem;
-import net.runelite.client.ui.FontManager;
-import net.runelite.client.ui.overlay.WidgetItemOverlay;
+import net.runelite.client.ui.overlay.Overlay;
+import net.runelite.client.ui.overlay.OverlayLayer;
+import net.runelite.client.ui.overlay.OverlayPosition;
 
-import net.runelite.client.ui.overlay.components.ImageComponent;
-import net.runelite.client.ui.overlay.tooltip.Tooltip;
-import net.runelite.client.ui.overlay.tooltip.TooltipManager;
-import net.runelite.client.util.ColorUtil;
-
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 @Slf4j
-public class FriendlyFishingOverlay extends WidgetItemOverlay
+public class FriendlyFishingOverlay extends Overlay
 {
 
     // general
     private final Client client;
     private final FriendlyFishingPlugin plugin;
     private final FriendlyFishingConfig config;
-    private final TooltipManager tooltipManager;
 
-    // modifiers
-    // buffered images for cards, only load once
-    private CardSuit cardSuit = CardSuit.CLUBS;
-    private final BufferedImage clubsBufferedImage = cardSuit.loadImage(CardSuit.CLUBS);
-    private final BufferedImage diamondsBufferedImage = cardSuit.loadImage(CardSuit.DIAMONDS);
-    private final BufferedImage heartsBufferedImage = cardSuit.loadImage(CardSuit.HEARTS);
-    private final BufferedImage spadesBufferedImage = cardSuit.loadImage(CardSuit.SPADES);
+    // relatively unchanging
+    private BufferedImage spritesheet;
+    private final int speed = 3; // tick delay between anim (lower = faster)
 
+    // changing
+    private final List<Dice> dices = new LinkedList<>();
+    private boolean init = false;
 
     @Inject
-    FriendlyFishingOverlay(Client client, FriendlyFishingPlugin plugin, FriendlyFishingConfig config, TooltipManager tooltipManager)
+    FriendlyFishingOverlay(Client client, FriendlyFishingPlugin plugin, FriendlyFishingConfig config)
     {
-        this.client = client;
+        super(plugin);
+        setPosition(OverlayPosition.DYNAMIC);
+        setLayer(OverlayLayer.ALWAYS_ON_TOP);
         this.plugin = plugin;
+        this.client = client;
         this.config = config;
-        this.tooltipManager = tooltipManager;
 
-        showOnInventory();
+       try {
+           spritesheet = ImageIO.read(getClass().getResource("/spritesheet.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
+    public BufferedImage getSprite(int col, int row, int width, int height) {
+        BufferedImage img = spritesheet.getSubimage((col * 16) - 16, (row * 16) -16, width, height);
+        return img;
+    }
 
+    /**
+     * Render method
+     */
     @Override
-    public void renderItemOverlay(Graphics2D graphics, int itemId, WidgetItem widgetItem)
-    {
-        // check rods first
+    public Dimension render(Graphics2D g) {
 
-        if (itemId == ItemID.FISHING_ROD && config.fishingRodName().length() > 0) {
-            // done like this because detection is spotty
-            if (!widgetItem.getCanvasBounds().contains(client.getMouseCanvasPosition().getX(), client.getMouseCanvasPosition().getY()))
-            {
-            } else {
-                tooltipManager.add(new Tooltip(ColorUtil.wrapWithColorTag(config.fishingRodName(), Color.ORANGE)));
+        if(!init) {
+            init = true;
+            Dimension dims = client.getRealDimensions();
+            int width = dims.width;
+            int height = dims.height;
+
+            for (int i = 0; i <= 5; i++) {
+                dices.add(new Dice(width, height));
             }
-            return;
         }
 
-        if (itemId == ItemID.FLY_FISHING_ROD && config.flyFishingRodName().length() > 0) {
-            // done like this because detection is spotty
-            if (!widgetItem.getCanvasBounds().contains(client.getMouseCanvasPosition().getX(), client.getMouseCanvasPosition().getY()))
-            {
-            } else {
-                tooltipManager.add(new Tooltip(ColorUtil.wrapWithColorTag(config.flyFishingRodName(), Color.ORANGE)));
-            }
-            return;
+        for(Dice dice : dices) {
+            BufferedImage sprite = getSprite(dice.col, dice.row, 16, 16);
+            g.drawImage(sprite, dice.x, dice.y, 32, 32,null);
+            dice.next();
         }
 
-        // check it's a catchable item
-        // if not then clear the slots memory
-        // we check again here because the interface is faster than ticks
-        if (!plugin.catchables.containsKey(itemId) || !plugin.catches.containsKey(widgetItem.getIndex()))
-        {
-            return;
-        }
-
-        FriendlyFishingPlugin.Fish fish = plugin.catches.get(widgetItem.getIndex());
-
-        // this fish is not worth highlighting
-        if (fish == null || !fish.size.show) {
-            return;
-        }
-
-        final Rectangle bounds = widgetItem.getCanvasBounds();
-        final int x = bounds.x - 3;
-        final int y = bounds.y + 15;
-        String text = fish.size.label;
-
-        // bug workaround, prevent incorrect mode fish appearing when it's off
-        if (!config.cardsMode() && text.length() == 2 || config.cardsMode() && text.length() != 2) {
-            return;
-        }
-
-        if (config.cardsMode() && text.length() == 2) {
-            fish.size.tip = text;
-            char suit = text.charAt(1);
-            text = ""+text.charAt(0);
-            BufferedImage bufferedImage = spadesBufferedImage;
-
-            switch (suit) {
-                case 'c':
-                    bufferedImage = clubsBufferedImage;
-                    break;
-                case 'd':
-                    bufferedImage = diamondsBufferedImage;
-                    break;
-                case 'h':
-                    bufferedImage = heartsBufferedImage;
-                    break;
-                case 's':
-                    bufferedImage = spadesBufferedImage;
-                    break;
-            }
-
-            ImageComponent imageComponent = new ImageComponent(bufferedImage);
-            final Point point = new Point();
-            point.setLocation(x, y);
-            imageComponent.setPreferredLocation(point);
-            imageComponent.render(graphics);
-
-        }
-
-        // standard behavior here
-        graphics.setFont(FontManager.getRunescapeSmallFont());
-        graphics.setColor(Color.BLACK);
-        graphics.drawString(text, x, y);
-        graphics.drawString(text, x + 2, y + 2);
-        graphics.setColor(fish.size.color);
-        graphics.drawString(text, x + 1, y + 1);
-
-        // mouse is not over fish
-        // done like this because detection is spotty
-        if (fish.size.tip.length() < 1 || !widgetItem.getCanvasBounds().contains(client.getMouseCanvasPosition().getX(), client.getMouseCanvasPosition().getY()))
-        {
-            return;
-        }
-
-        // mouse is not over fish
-        // done like this because detection is spotty
-        tooltipManager.add(new Tooltip(ColorUtil.wrapWithColorTag(fish.size.tip, Color.YELLOW)));
+        return null;
     }
 }
