@@ -115,13 +115,6 @@ public class FriendlyFishingOverlay extends Overlay
      */
     @Override
     public Dimension render(Graphics2D g) {
-
-        // someones changed the config, reset and re-roll
-        if(knownDiceCount != config.diceCount()) {
-            reset();
-            init();
-        }
-
         if(init && plugin.ROLL_DICE) {
             for (Dice dice : dices) {
                 BufferedImage sprite = getSprite(dice.col, dice.row, 16, 16);

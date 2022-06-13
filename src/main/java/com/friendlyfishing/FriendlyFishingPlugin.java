@@ -13,6 +13,8 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
+import java.awt.*;
+
 
 @Slf4j
 @PluginDescriptor(
@@ -35,7 +37,7 @@ public class FriendlyFishingPlugin extends Plugin
 	@Inject
 	private OverlayManager overlayManager;
 
-	public boolean ROLL_DICE = true;
+	public boolean ROLL_DICE = false;
 	private Widget button = null;
 
 	@Override
@@ -72,6 +74,17 @@ public class FriendlyFishingPlugin extends Plugin
 		createButton();
 	}
 
+	private void trigger() {
+		ROLL_DICE = !ROLL_DICE;
+		if(ROLL_DICE) {
+			button.setSpriteId(SpriteID.OPTIONS_ROUND_CHECK_BOX_CROSSED);
+			button.setAction(0, "Put away dice");
+		} else {
+			button.setSpriteId(573);
+			button.setAction(0, "Roll dice");
+		}
+	}
+
 	private void hideButton()
 	{
 		if (button == null)
@@ -99,13 +112,9 @@ public class FriendlyFishingPlugin extends Plugin
 		button.setOriginalX(48);
 		button.setOriginalY(14);
 		button.setSpriteId(573);
-		// button.setAction(0, "Screenshot");
-		// button.setOnOpListener((JavaScriptCallback) (e) -> clientThread.invokeLater(this::screenshotEquipment));
+		button.setAction(0, "Roll dice");
+		button.setOnOpListener((JavaScriptCallback) (e) -> clientThread.invokeLater(this::trigger));
 		button.setHasListener(true);
 		button.revalidate();
-
-		button.setOnMouseOverListener((JavaScriptCallback) (e) -> button.setSpriteId(570));
-		button.setOnMouseLeaveListener((JavaScriptCallback) (e) -> button.setSpriteId(573));
 	}
-
 }

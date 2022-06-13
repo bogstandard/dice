@@ -39,7 +39,7 @@ public interface FriendlyFishingConfig extends Config
     )
     default boolean flashResults()
     {
-        return true;
+        return false;
     }
 
 
@@ -50,6 +50,6 @@ public interface FriendlyFishingConfig extends Config
     )
     default Color diceColor()
     {
-        return new Color(255, 175, 0);
+        return new Color(255, 215, 0);
     }
 }
