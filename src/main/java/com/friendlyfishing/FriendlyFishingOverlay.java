@@ -25,11 +25,11 @@ public class FriendlyFishingOverlay extends Overlay
 
     // relatively unchanging
     private BufferedImage spritesheet;
-    private final int speed = 3; // tick delay between anim (lower = faster)
 
     // changing
     private final List<Dice> dices = new LinkedList<>();
     private boolean init = false;
+    private int knownDiceCount;
 
     @Inject
     FriendlyFishingOverlay(Client client, FriendlyFishingPlugin plugin, FriendlyFishingConfig config)
@@ -48,6 +48,23 @@ public class FriendlyFishingOverlay extends Overlay
         }
     }
 
+    public void reset() {
+        dices.clear();
+        init = false;
+    }
+
+    public void init() {
+        knownDiceCount = config.diceCount();
+        init = true;
+        Dimension dims = client.getRealDimensions();
+        int width = dims.width;
+        int height = dims.height;
+
+        for (int i = 0; i < config.diceCount(); i++) {
+            dices.add(new Dice(width, height, config.flashResults()));
+        }
+    }
+
     public BufferedImage getSprite(int col, int row, int width, int height) {
         BufferedImage img = spritesheet.getSubimage((col * 16) - 16, (row * 16) -16, width, height);
         return img;
@@ -59,23 +76,23 @@ public class FriendlyFishingOverlay extends Overlay
     @Override
     public Dimension render(Graphics2D g) {
 
-        if(!init) {
-            init = true;
-            Dimension dims = client.getRealDimensions();
-            int width = dims.width;
-            int height = dims.height;
+        // someones changed the config, reset and re-roll
+        if(knownDiceCount != config.diceCount()) {
+            reset();
+            init();
+        }
 
-            for (int i = 0; i <= 5; i++) {
-                dices.add(new Dice(width, height));
+        if(init && plugin.ROLL_DICE) {
+            for (Dice dice : dices) {
+                BufferedImage sprite = getSprite(dice.col, dice.row, 16, 16);
+                g.drawImage(sprite, dice.x, dice.y, 32, 32, null);
+                dice.next();
             }
+        } else if(!init && plugin.ROLL_DICE) {
+                init();
+        } else {
+            reset();
         }
-
-        for(Dice dice : dices) {
-            BufferedImage sprite = getSprite(dice.col, dice.row, 16, 16);
-            g.drawImage(sprite, dice.x, dice.y, 32, 32,null);
-            dice.next();
-        }
-
         return null;
     }
 }

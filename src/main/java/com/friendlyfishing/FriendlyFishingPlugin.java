@@ -32,6 +32,8 @@ public class FriendlyFishingPlugin extends Plugin
 	@Inject
 	private OverlayManager overlayManager;
 
+	public boolean ROLL_DICE = true;
+
 	@Override
 	protected void startUp() throws Exception
 	{
@@ -50,5 +52,9 @@ public class FriendlyFishingPlugin extends Plugin
 	FriendlyFishingConfig provideConfig(ConfigManager configManager)
 	{
 		return configManager.getConfig(FriendlyFishingConfig.class);
+	}
+
+	public void trigger() {
+		ROLL_DICE = !ROLL_DICE;
 	}
 }
