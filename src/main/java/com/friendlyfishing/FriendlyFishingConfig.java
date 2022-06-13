@@ -18,7 +18,18 @@ public interface FriendlyFishingConfig extends Config
     )
     default int diceCount()
     {
-        return 7;
+        return 5;
+    }
+
+
+    @ConfigItem(
+            keyName = "diceOpacity",
+            name = "Dice opacity (0—1)",
+            description = "Do you want the dice see-through?"
+    )
+    default double diceOpacity()
+    {
+        return 0.8;
     }
 
     @ConfigItem(
@@ -28,18 +39,17 @@ public interface FriendlyFishingConfig extends Config
     )
     default boolean flashResults()
     {
-        return false;
+        return true;
     }
 
 
     @ConfigItem(
-            position = 12,
             keyName = "diceColor",
             name = "Dice Color",
             description = "The color of the dice."
     )
     default Color diceColor()
     {
-        return new Color(255, 255, 255);
+        return new Color(255, 175, 0);
     }
 }

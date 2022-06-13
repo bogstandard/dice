@@ -14,8 +14,8 @@ class Dice {
     int col;
     int row;
     int finalRow; // row to flash to
-    final int minLife = 60;
-    final int maxLife = 120;
+    final int minLife = 30;
+    final int maxLife = 80;
     private final int bezel = 100; // prevent dice being too near edge at spawn
     int xDrift;
     int yDrift;

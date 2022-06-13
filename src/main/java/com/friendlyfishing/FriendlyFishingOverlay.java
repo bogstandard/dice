@@ -131,7 +131,7 @@ public class FriendlyFishingOverlay extends Overlay
                     float tintR = (tint.getRed() / 255.0f);
                     float tintG = (tint.getGreen() / 255.0f);
                     float tintB = (tint.getBlue() / 255.0f);
-                    sprite = tint(tintR, tintG, tintB, 1, sprite);
+                    sprite = tint(tintR, tintG, tintB, (float) config.diceOpacity(), sprite);
                 }
 
                 g.drawImage(sprite, dice.x, dice.y, 32, 32, null);
