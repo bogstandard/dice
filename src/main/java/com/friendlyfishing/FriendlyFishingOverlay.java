@@ -53,6 +53,9 @@ public class FriendlyFishingOverlay extends Overlay
         init = false;
     }
 
+    /**
+     * Initialise a roll
+     */
     public void init() {
         knownDiceCount = config.diceCount();
         init = true;
@@ -61,13 +64,50 @@ public class FriendlyFishingOverlay extends Overlay
         int height = dims.height;
 
         for (int i = 0; i < config.diceCount(); i++) {
-            dices.add(new Dice(width, height, config.flashResults()));
+            dices.add(new Dice(width, height));
         }
     }
 
+    /**
+     * Sprite plucking method
+     */
     public BufferedImage getSprite(int col, int row, int width, int height) {
         BufferedImage img = spritesheet.getSubimage((col * 16) - 16, (row * 16) -16, width, height);
         return img;
+    }
+
+    /**
+     * Tint a plucked sprite
+     */
+    protected BufferedImage tint(float r, float g, float b, float a,
+                                 BufferedImage sprite)
+    {
+        BufferedImage tintedSprite = new BufferedImage(sprite.getWidth(), sprite.
+                getHeight(), BufferedImage.TRANSLUCENT);
+        Graphics2D graphics = tintedSprite.createGraphics();
+        graphics.drawImage(sprite, 0, 0, null);
+        graphics.dispose();
+
+        for (int i = 0; i < tintedSprite.getWidth(); i++)
+        {
+            for (int j = 0; j < tintedSprite.getHeight(); j++)
+            {
+                int ax = tintedSprite.getColorModel().getAlpha(tintedSprite.getRaster().
+                        getDataElements(i, j, null));
+                int rx = tintedSprite.getColorModel().getRed(tintedSprite.getRaster().
+                        getDataElements(i, j, null));
+                int gx = tintedSprite.getColorModel().getGreen(tintedSprite.getRaster().
+                        getDataElements(i, j, null));
+                int bx = tintedSprite.getColorModel().getBlue(tintedSprite.getRaster().
+                        getDataElements(i, j, null));
+                rx *= r;
+                gx *= g;
+                bx *= b;
+                ax *= a;
+                tintedSprite.setRGB(i, j, (ax << 24) | (rx << 16) | (gx << 8) | (bx));
+            }
+        }
+        return tintedSprite;
     }
 
     /**
@@ -85,8 +125,17 @@ public class FriendlyFishingOverlay extends Overlay
         if(init && plugin.ROLL_DICE) {
             for (Dice dice : dices) {
                 BufferedImage sprite = getSprite(dice.col, dice.row, 16, 16);
+
+                if(!config.flashResults() || (config.flashResults() && dice.life > 0) || (config.flashResults() && dice.altFrame)) {
+                    Color tint = config.diceColor();
+                    float tintR = (tint.getRed() / 255.0f);
+                    float tintG = (tint.getGreen() / 255.0f);
+                    float tintB = (tint.getBlue() / 255.0f);
+                    sprite = tint(tintR, tintG, tintB, 1, sprite);
+                }
+
                 g.drawImage(sprite, dice.x, dice.y, 32, 32, null);
-                dice.next();
+                dice.next(dices);
             }
         } else if(!init && plugin.ROLL_DICE) {
                 init();

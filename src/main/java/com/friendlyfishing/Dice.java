@@ -2,6 +2,7 @@ package com.friendlyfishing;
 
 import net.runelite.client.config.Config;
 
+import java.util.List;
 import java.util.Random;
 
 class Dice {
@@ -24,9 +25,9 @@ class Dice {
     final int maxSpeed = 10;
     int canvasWidth;
     int canvasHeight;
-    boolean flashResults;
+    boolean altFrame = false;
 
-    public Dice(int canvasWidth, int canvasHeight, boolean flashResults) {
+    public Dice(int canvasWidth, int canvasHeight) {
         this.r = new Random();
         this.canvasWidth = canvasWidth;
         this.canvasHeight = canvasHeight;
@@ -40,9 +41,8 @@ class Dice {
         this.col = 1 + r.nextInt(6 - 1 + 1);
         this.row = 15;
         this.finalRow = 2 + r.nextInt(11 - 1 + 1);
-        this.xDrift = -10 + r.nextInt(1 - -10 + 1);
-        this.yDrift = -10 + r.nextInt(1 - -10 + 1);
-        this.flashResults = flashResults;
+        this.xDrift = -15 + r.nextInt(1 - -15 + 1);
+        this.yDrift = -15 + r.nextInt(1 - -15 + 1);
     }
 
     // drifts dice to mimic movement
@@ -58,42 +58,31 @@ class Dice {
         y += yDrift;
     }
 
+
     // moves to next frame (col in spritesheet)
-    public void next() {
-
+    public void next(List<Dice> siblings) {
         if(life > 0) {
-            this.drift();
+            drift();
             life--;
+        }
 
-            if (ticks > 0) { // idle on current anim frame
-                ticks--;
-            } else {
+        if (ticks > 0) { // idle on current anim frame
+            ticks--;
+        } else {
+            altFrame = !altFrame; // flag an advance
 
-                if(speed < maxSpeed) { // slow gradually
-                    speed++;
-                }
+            if(speed < maxSpeed) { // slow gradually
+                speed++;
+            }
 
+            if(life > 0) {
                 ticks = speed;
-
                 col++;
                 if (col > 6) {
                     col = 1;
                 }
-            }
-        } else {
-            if(flashResults) {
-                if (ticks > 0) { // idle on current anim frame
-                    ticks--;
-                } else {
-                    ticks = speed * 4;
-                    // its settled, color it randomly, just not white
-                    if (row == 1) {
-                        row = finalRow;
-                    } else {
-                        row = 1;
-                    }
-                }
             } else {
+                ticks = speed * 2; // slow things down now
                 row = 1;
             }
         }
