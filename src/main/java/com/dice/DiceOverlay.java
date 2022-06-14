@@ -168,7 +168,7 @@ public class DiceOverlay extends Overlay {
 
             if (dice.y < dims.height + 100) {
               allDiceFallen = false;
-              dice.y += Math.abs(dice.yDrift) + 8; // fall down!
+              dice.y += Math.abs(dice.yDrift) + 13; // fall down!
             }
           } else {
             allDiceFallen = false;

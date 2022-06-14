@@ -37,7 +37,7 @@ public interface DiceConfig extends Config {
   }
 
   @ConfigItem(position = 4, keyName = "autoPutAway", name = "Auto tidy", description = "Put away dice after a few moments automatically?")
-  default boolean autoPutAway() { return false; }
+  default boolean autoPutAway() { return true; }
 
   @Units(Units.TICKS)
   @ConfigItem(position = 5, keyName = "autoPutAwayTicks", name = "Auto tidy delay", description = "How quickly to auto tidy?")
