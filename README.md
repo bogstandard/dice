@@ -16,9 +16,8 @@ Fulfill your roleplay needs or play as a "Diceman mode" account!
   - Immersive & dynamic animation, dice collide & knock the edges of the game window.
 
 ## Screenshots
-
-![Image showing demo of dice animation](https://raw.githubusercontent.com/bogstandard/dice/master/basic-dice-anim.gif?token=GHSAT0AAAAAABVTKNPXZ6TPCTPXLCOQ7IOOYVJD2ZQ)
+![Image showing demo of dice animation](basic-dice-anim.gif)
 > *Basic dice, the player has made them white*
 
-![Image showing demo of dice animation](https://raw.githubusercontent.com/bogstandard/dice/master/advanced-dice.png?token=GHSAT0AAAAAABVTKNPXAQBGCA4MH736LREYYVJD5CA)
+![Image showing demo of dice animation](advanced-dice.png)
 > *Advanced dice, the player has established several D10s D20s and D50s in a special colour scheme!*
