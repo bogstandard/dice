@@ -13,8 +13,6 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
-import java.awt.*;
-
 @Slf4j
 @PluginDescriptor(name = "Friendly Fishing")
 public class DicePlugin extends Plugin {

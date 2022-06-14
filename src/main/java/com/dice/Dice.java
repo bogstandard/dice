@@ -1,7 +1,5 @@
 package com.dice;
 
-import net.runelite.client.config.Config;
-
 import java.util.List;
 import java.util.Random;
 
