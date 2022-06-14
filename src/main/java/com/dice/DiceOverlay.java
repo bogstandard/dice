@@ -6,6 +6,7 @@ import net.runelite.api.Client;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.client.util.ImageUtil;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -13,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import net.runelite.client.ui.FontManager;
 
 @Slf4j
 public class DiceOverlay extends Overlay {
@@ -24,11 +26,12 @@ public class DiceOverlay extends Overlay {
 
   // relatively unchanging
   private BufferedImage spritesheet;
+  FontMetrics metrics;
+  private Font font;
 
   // changing
   private final List<Dice> dices = new LinkedList<>();
   private boolean init = false;
-  private int knownDiceCount;
 
   @Inject
   DiceOverlay(Client client, DicePlugin plugin, DiceConfig config) {
@@ -38,14 +41,13 @@ public class DiceOverlay extends Overlay {
     this.plugin = plugin;
     this.client = client;
     this.config = config;
-
-    try {
-      spritesheet = ImageIO.read(getClass().getResource("/spritesheet.png"));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    spritesheet = ImageUtil.loadImageResource(DicePlugin.class, "/spritesheet.png");
+    font = FontManager.getRunescapeBoldFont();
   }
 
+  /**
+   * Clear current roll
+   */
   public void reset() {
     dices.clear();
     init = false;
@@ -54,15 +56,29 @@ public class DiceOverlay extends Overlay {
   /**
    * Initialise a roll
    */
-  public void init() {
-    knownDiceCount = config.diceCount();
+  public void init(Graphics2D g) {
+    g.setFont(font);
+    metrics = g.getFontMetrics(font);
     init = true;
     Dimension dims = client.getRealDimensions();
     int width = dims.width;
     int height = dims.height;
+    int diceCount = config.diceCount();
 
-    for (int i = 0; i < config.diceCount(); i++) {
-      dices.add(new Dice(width, height));
+    if(config.diceAdvancedNotation().length() > 0) {
+      String[] notation = config.diceAdvancedNotation().split("\\s+");
+      for (String notedDice : notation) {
+        try {
+          int magicSides = Integer.valueOf(notedDice.substring(1));
+          dices.add(new Dice(width, height, magicSides));
+        } catch (Exception e) {
+          // fail silent..
+        }
+      }
+    } else { // add normal dice
+      for (int i = 0; i < diceCount; i++) {
+        dices.add(new Dice(width, height, 0));
+      }
     }
   }
 
@@ -101,10 +117,21 @@ public class DiceOverlay extends Overlay {
   }
 
   /**
+   * Draw a String centered in the middle of a Rectangle.
+   */
+  public void drawCenteredString(Graphics g, String text, Dice dice) {
+    int x = dice.x + (32 - metrics.stringWidth(text)) / 2;
+    int y = dice.y + ((32 - metrics.getHeight()) / 2) + metrics.getAscent();
+    g.drawString(text, x, y);
+  }
+
+  /**
    * Render method
    */
   @Override
   public Dimension render(Graphics2D g) {
+    g.setFont(font);
+
     if (init && plugin.ROLL_DICE) {
       for (Dice dice : dices) {
         BufferedImage sprite = getSprite(dice.col, dice.row, 16, 16);
@@ -115,14 +142,21 @@ public class DiceOverlay extends Overlay {
           float tintR = (tint.getRed() / 255.0f);
           float tintG = (tint.getGreen() / 255.0f);
           float tintB = (tint.getBlue() / 255.0f);
-          sprite = tint(tintR, tintG, tintB, (float) config.diceOpacity(), sprite);
+          sprite = tint(tintR, tintG, tintB, ((float)config.diceOpacity() / 100), sprite);
         }
 
         g.drawImage(sprite, dice.x, dice.y, 32, 32, null);
+
+        if(dice.life <= 0 && dice.magicSides > 0) {
+          g.setColor(config.diceDigitColor());
+          g.drawString("", dice.x, dice.y);
+          drawCenteredString(g, ""+dice.result, dice);
+        }
+
         dice.next(dices);
       }
     } else if (!init && plugin.ROLL_DICE) {
-      init();
+      init(g);
     } else {
       reset();
     }

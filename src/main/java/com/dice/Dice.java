@@ -26,8 +26,10 @@ class Dice {
   int canvasWidth;
   int canvasHeight;
   boolean altFrame = false;
+  int magicSides;
+  int result = -1;
 
-  public Dice(int canvasWidth, int canvasHeight) {
+  public Dice(int canvasWidth, int canvasHeight, int magicSides) {
     this.r = new Random();
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;
@@ -43,6 +45,7 @@ class Dice {
     this.finalRow = 2 + r.nextInt(11 - 1 + 1);
     this.xDrift = -15 + r.nextInt(1 - -15 + 1);
     this.yDrift = -15 + r.nextInt(1 - -15 + 1);
+    this.magicSides = magicSides;
   }
 
   // drifts dice to mimic movement
@@ -61,7 +64,8 @@ class Dice {
   private void uncollide(List<Dice> siblings) {
     for (Dice sibling : siblings) {
       if (this != sibling && this.life <= 0 && sibling.life <= 0 && overlaps(sibling)) {
-        this.life = minLife;
+        this.life = 10;
+        this.speed = 5;
         this.row = 15; // revive the rolling
       }
     }
@@ -97,7 +101,15 @@ class Dice {
         }
       } else {
         ticks = speed * 2; // slow things down now
-        row = 1;
+        if(this.magicSides > 0) {  // its a magic dice..
+          row = 13;
+          col = 1;
+          if(result == -1) {
+            result = 1 + r.nextInt(magicSides - 1 + 1);
+          }
+        } else {
+          row = 1; // its a normal dice..
+        }
       }
     }
   }
