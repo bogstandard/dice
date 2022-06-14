@@ -14,7 +14,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 @Slf4j
-@PluginDescriptor(name = "Friendly Fishing")
+@PluginDescriptor(name = "Dice")
 public class DicePlugin extends Plugin {
   @Inject
   private Client client;
@@ -36,7 +36,7 @@ public class DicePlugin extends Plugin {
 
   @Override
   protected void startUp() throws Exception {
-    log.info("Friendly Fishing started!");
+    log.info("Dice started!");
     overlayManager.add(overlay);
     clientThread.invokeLater(this::createButton);
   }
@@ -45,7 +45,7 @@ public class DicePlugin extends Plugin {
   protected void shutDown() throws Exception {
     overlayManager.remove(overlay);
     clientThread.invoke(this::hideButton);
-    log.info("Friendly Fishing stopped!");
+    log.info("Dice stopped!");
   }
 
   @Provides
