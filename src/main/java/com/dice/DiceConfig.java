@@ -40,7 +40,7 @@ public interface DiceConfig extends Config {
           position = 4,
           keyName = "diceAdvancedNotation",
           name = "Advanced Notation (optional)",
-          description = "Separate desired dice by spaces eg. D6 D6 D10 D20 D20<br>NOTE: This overrides the above number of dice.<br>Leave blank if unsure!")
+          description = "Separate by spaces eg. D6 D6 D10 D20 D20<br><br>This overrides the above number of dice.<br><br>Leave blank if unsure!")
   default String diceAdvancedNotation() {
     return "";
   }
