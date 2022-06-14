@@ -26,6 +26,7 @@ class Dice {
   boolean altFrame = false;
   int magicSides;
   int result = -1;
+  boolean dead = false;
 
   public Dice(int canvasWidth, int canvasHeight, int magicSides) {
     this.r = new Random();
@@ -78,7 +79,7 @@ class Dice {
     if (life > 0) {
       drift();
       life--;
-    } else {
+    } else if (!dead){
       uncollide(siblings);
     }
 

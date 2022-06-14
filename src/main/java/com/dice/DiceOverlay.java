@@ -26,10 +26,12 @@ public class DiceOverlay extends Overlay {
   private BufferedImage spritesheet;
   FontMetrics metrics;
   private Font font;
+  Dimension dims;
 
   // changing
   private final List<Dice> dices = new LinkedList<>();
   private boolean init = false;
+  private int putAwayTimer;
 
   @Inject
   DiceOverlay(Client client, DicePlugin plugin, DiceConfig config) {
@@ -55,12 +57,12 @@ public class DiceOverlay extends Overlay {
    * Initialise a roll
    */
   public void init(Graphics2D g) {
+    putAwayTimer = config.autoPutAwayTicks();
+
     g.setFont(font);
     metrics = g.getFontMetrics(font);
     init = true;
-    Dimension dims = client.getRealDimensions();
-    int width = dims.width;
-    int height = dims.height;
+    dims = client.getRealDimensions();
     int diceCount = config.diceCount();
 
     if(config.diceAdvancedNotation().length() > 0) {
@@ -68,14 +70,14 @@ public class DiceOverlay extends Overlay {
       for (String notedDice : notation) {
         try {
           int magicSides = Integer.valueOf(notedDice.substring(1));
-          dices.add(new Dice(width, height, magicSides));
+          dices.add(new Dice(dims.width, dims.height, magicSides));
         } catch (Exception e) {
           // fail silent..
         }
       }
     } else { // add normal dice
       for (int i = 0; i < diceCount; i++) {
-        dices.add(new Dice(width, height, 0));
+        dices.add(new Dice(dims.width, dims.height, 0));
       }
     }
   }
@@ -131,6 +133,10 @@ public class DiceOverlay extends Overlay {
     g.setFont(font);
 
     if (init && plugin.ROLL_DICE) {
+
+      boolean allDiceDead = true;
+      boolean allDiceFallen = true;
+
       for (Dice dice : dices) {
         BufferedImage sprite = getSprite(dice.col, dice.row, 16, 16);
 
@@ -152,7 +158,32 @@ public class DiceOverlay extends Overlay {
         }
 
         dice.next(dices);
+
+        if(dice.life > 0) {
+          allDiceDead = false;
+          allDiceFallen = false;
+        } else {
+          if (config.autoPutAway() && putAwayTimer < 0) {
+            dice.dead = true;
+
+            if (dice.y < dims.height + 100) {
+              allDiceFallen = false;
+              dice.y += Math.abs(dice.yDrift) + 8; // fall down!
+            }
+          } else {
+            allDiceFallen = false;
+          }
+        }
       }
+
+      if (allDiceDead) {
+        putAwayTimer--;
+      }
+
+      if (config.autoPutAway() && allDiceDead && allDiceFallen) {
+        plugin.trigger(); // auto reset, like the player toggled manually
+      }
+
     } else if (!init && plugin.ROLL_DICE) {
       init(g);
     } else {

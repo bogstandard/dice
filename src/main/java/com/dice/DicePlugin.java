@@ -62,7 +62,7 @@ public class DicePlugin extends Plugin {
     createButton();
   }
 
-  private void trigger() {
+  protected void trigger() {
     ROLL_DICE = !ROLL_DICE;
     if (ROLL_DICE) {
       button.setSpriteId(SpriteID.OPTIONS_ROUND_CHECK_BOX_CROSSED);

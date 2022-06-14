@@ -23,7 +23,7 @@ public interface DiceConfig extends Config {
   @Units(Units.PERCENT)
   @ConfigItem(position = 1, keyName = "diceOpacity", name = "Dice opacity", description = "Do you want the dice see-through?")
   default int diceOpacity() {
-    return 80;
+    return 100;
   }
 
   @ConfigItem(position = 2, keyName = "flashResults", name = "Flash Results", description = "Flash Dice when they stop?")
@@ -36,8 +36,17 @@ public interface DiceConfig extends Config {
     return new Color(255, 215, 0);
   }
 
+  @ConfigItem(position = 4, keyName = "autoPutAway", name = "Auto tidy", description = "Put away dice after a few moments automatically?")
+  default boolean autoPutAway() { return false; }
+
+  @Units(Units.TICKS)
+  @ConfigItem(position = 5, keyName = "autoPutAwayTicks", name = "Auto tidy delay", description = "How quickly to auto tidy?")
+  default int autoPutAwayTicks() {
+    return 120;
+  }
+
   @ConfigItem(
-          position = 4,
+          position = 6,
           keyName = "diceAdvancedNotation",
           name = "Advanced Notation (optional)",
           description = "Separate by spaces eg. D6 D6 D10 D20 D20<br><br>This overrides the above number of dice.<br><br>Leave blank if unsure!")
@@ -45,7 +54,7 @@ public interface DiceConfig extends Config {
     return "";
   }
 
-  @ConfigItem(position = 5, keyName = "diceDigitColor", name = "Dice Digit Color", description = "The color of the dice digits if using Advanced Notation.")
+  @ConfigItem(position = 7, keyName = "diceDigitColor", name = "Dice Digit Color", description = "The color of the dice digits if using Advanced Notation.")
   default Color diceDigitColor() {
     return new Color(0, 0, 0);
   }
