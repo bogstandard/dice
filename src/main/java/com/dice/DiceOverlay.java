@@ -153,8 +153,9 @@ public class DiceOverlay extends Overlay {
 
         if(dice.life <= 0 && dice.magicSides > 0) {
           g.setColor(config.diceDigitColor());
-          g.drawString("", dice.x, dice.y);
-          drawCenteredString(g, ""+dice.result, dice);
+          if(dice.result > -1) { // prevent flash of -1
+            drawCenteredString(g, "" + dice.result, dice);
+          }
         }
 
         dice.next(dices);
