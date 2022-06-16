@@ -6,6 +6,7 @@ Fulfill your roleplay needs or play as a "Diceman mode" account!
 
 ## Features
   - On screen **animated** dice of any amount, colour and type (eg. D6, D10, D20 etc)!
+  - Animation is different **every time**.
   - Change the colour of the dice.
   - Change the colour of dice text.
   - Choose any amount of dice.
