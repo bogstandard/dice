@@ -26,7 +26,9 @@ public class DiceOverlay extends Overlay {
   private BufferedImage spritesheet;
   FontMetrics metrics;
   private Font font;
+  private Font fontSmall;
   Dimension dims;
+  Color[] colors = new Color[]{Color.WHITE, Color.ORANGE, Color.RED, Color.BLUE, Color.GREEN};
 
   // changing
   private final List<Dice> dices = new LinkedList<>();
@@ -43,6 +45,7 @@ public class DiceOverlay extends Overlay {
     this.config = config;
     spritesheet = ImageUtil.loadImageResource(DicePlugin.class, "/spritesheet.png");
     font = FontManager.getRunescapeBoldFont();
+    fontSmall = FontManager.getRunescapeSmallFont();
   }
 
   /**
@@ -119,9 +122,9 @@ public class DiceOverlay extends Overlay {
   /**
    * Draw a String centered in the middle of a Rectangle.
    */
-  public void drawCenteredString(Graphics g, String text, Dice dice) {
-    int x = dice.x + (32 - metrics.stringWidth(text)) / 2;
-    int y = dice.y + ((32 - metrics.getHeight()) / 2) + metrics.getAscent();
+  public void drawCenteredString(Graphics g, String text, Dice dice, int offsetx, int offsety) {
+    int x = (dice.x + (32 - metrics.stringWidth(text)) / 2) + offsetx;
+    int y = (dice.y + ((32 - metrics.getHeight()) / 2) + metrics.getAscent()) + offsety;
     g.drawString(text, x, y);
   }
 
@@ -130,12 +133,11 @@ public class DiceOverlay extends Overlay {
    */
   @Override
   public Dimension render(Graphics2D g) {
-    g.setFont(font);
-
     if (init && plugin.ROLL_DICE) {
 
       boolean allDiceDead = true;
       boolean allDiceFallen = true;
+      int i = 0;
 
       for (Dice dice : dices) {
         BufferedImage sprite = getSprite(dice.col, dice.row, 16, 16);
@@ -143,6 +145,11 @@ public class DiceOverlay extends Overlay {
         if (!config.flashResults() || (config.flashResults() && dice.life > 0)
             || (config.flashResults() && dice.altFrame)) {
           Color tint = config.diceColor();
+
+          if(config.autoColorDice()) {
+            tint = colors[i % colors.length];
+          }
+
           float tintR = (tint.getRed() / 255.0f);
           float tintG = (tint.getGreen() / 255.0f);
           float tintB = (tint.getBlue() / 255.0f);
@@ -152,9 +159,36 @@ public class DiceOverlay extends Overlay {
         g.drawImage(sprite, dice.x, dice.y, 32, 32, null);
 
         if(dice.life <= 0 && dice.magicSides > 0) {
-          g.setColor(config.diceDigitColor());
           if(dice.result > -1) { // prevent flash of -1
-            drawCenteredString(g, "" + dice.result, dice);
+            g.setFont(font);
+            g.setColor(Color.BLACK);
+            drawCenteredString(g, "" + dice.result, dice, -1, -1);
+            drawCenteredString(g, "" + dice.result, dice, -1, 1);
+            drawCenteredString(g, "" + dice.result, dice, 1, 1);
+            drawCenteredString(g, "" + dice.result, dice, 1, -1);
+            g.setColor(config.diceDigitColor());
+            drawCenteredString(g, "" + dice.result, dice, 0, 0);
+          }
+        }
+
+        if(dice.life <= 0 && config.labelDice()) {
+          g.setFont(fontSmall);
+          if(dice.magicSides > 0) {
+            g.setColor(Color.BLACK);
+            g.drawString("D"+dice.magicSides, dice.x + 35, dice.y + 35);
+            g.drawString("D"+dice.magicSides, dice.x + 35, dice.y + 37);
+            g.drawString("D"+dice.magicSides, dice.x + 37, dice.y + 37);
+            g.drawString("D"+dice.magicSides, dice.x + 37, dice.y + 35);
+            g.setColor(Color.WHITE);
+            g.drawString("D"+dice.magicSides, dice.x + 36, dice.y + 36);
+          } else {
+            g.setColor(Color.BLACK);
+            g.drawString("D6", dice.x + 35, dice.y + 35);
+            g.drawString("D6", dice.x + 35, dice.y + 37);
+            g.drawString("D6", dice.x + 37, dice.y + 37);
+            g.drawString("D6", dice.x + 37, dice.y + 35);
+            g.setColor(Color.WHITE);
+            g.drawString("D6", dice.x + 36, dice.y + 36);
           }
         }
 
@@ -175,6 +209,8 @@ public class DiceOverlay extends Overlay {
             allDiceFallen = false;
           }
         }
+
+        i++;
       }
 
       if (allDiceDead) {

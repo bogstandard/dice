@@ -33,20 +33,24 @@ public interface DiceConfig extends Config {
 
   @ConfigItem(position = 3, keyName = "diceColor", name = "Dice Color", description = "The color of the dice.")
   default Color diceColor() {
-    return new Color(255, 215, 0);
+    return new Color(255, 205, 55);
   }
 
-  @ConfigItem(position = 4, keyName = "autoPutAway", name = "Auto tidy", description = "Put away dice after a few moments automatically?")
+
+  @ConfigItem(position = 4, keyName = "autoColorDice", name = "Auto Color Dice", description = "Let the system color the dice differently?")
+  default boolean autoColorDice() { return false; }
+
+  @ConfigItem(position = 5, keyName = "autoPutAway", name = "Auto tidy", description = "Put away dice after a few moments automatically?")
   default boolean autoPutAway() { return true; }
 
   @Units(Units.TICKS)
-  @ConfigItem(position = 5, keyName = "autoPutAwayTicks", name = "Auto tidy delay", description = "How quickly to auto tidy?")
+  @ConfigItem(position = 6, keyName = "autoPutAwayTicks", name = "Auto tidy delay", description = "How quickly to auto tidy?")
   default int autoPutAwayTicks() {
     return 120;
   }
 
   @ConfigItem(
-          position = 6,
+          position = 7,
           keyName = "diceAdvancedNotation",
           name = "Advanced Notation (optional)",
           description = "Separate by spaces eg. D6 D6 D10 D20 D20<br><br>This overrides the above number of dice.<br><br>Leave blank if unsure!")
@@ -54,7 +58,10 @@ public interface DiceConfig extends Config {
     return "";
   }
 
-  @ConfigItem(position = 7, keyName = "diceDigitColor", name = "Dice Digit Color", description = "The color of the dice digits if using Advanced Notation.")
+  @ConfigItem(position = 8, keyName = "labelDice", name = "Label Dice", description = "Show labels next to each dice?")
+  default boolean labelDice() { return false; }
+
+  @ConfigItem(position = 9, keyName = "diceDigitColor", name = "Dice Digit Color", description = "The color of the dice digits if using Advanced Notation.")
   default Color diceDigitColor() {
     return new Color(0, 0, 0);
   }
