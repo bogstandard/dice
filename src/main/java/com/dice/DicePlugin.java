@@ -13,6 +13,8 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
+import java.util.List;
+
 @Slf4j
 @PluginDescriptor(name = "Dice")
 public class DicePlugin extends Plugin {
@@ -71,6 +73,24 @@ public class DicePlugin extends Plugin {
       button.setSpriteId(573);
       button.setAction(0, "Roll dice");
     }
+  }
+
+  protected void sayTotal(List<Dice> dices) {
+    int total = 0;
+    String message = "";
+    int i = 0;
+    for (Dice dice : dices) {
+      total += dice.result;
+      message = message + dice.result;
+
+      if(i < dices.size() - 1) {
+        message = message + " + ";
+      }
+
+      i++;
+    }
+
+    client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "You rolled " + total + " (" + message + ")", null);
   }
 
   private void hideButton() {

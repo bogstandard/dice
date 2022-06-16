@@ -108,6 +108,7 @@ class Dice {
           }
         } else {
           row = 1; // its a normal dice..
+          result = col;
         }
       }
     }

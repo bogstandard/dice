@@ -33,6 +33,7 @@ public class DiceOverlay extends Overlay {
   // changing
   private final List<Dice> dices = new LinkedList<>();
   private boolean init = false;
+  private boolean unannounced = true;
   private int putAwayTimer;
 
   @Inject
@@ -65,6 +66,7 @@ public class DiceOverlay extends Overlay {
     g.setFont(font);
     metrics = g.getFontMetrics(font);
     init = true;
+    unannounced = true;
     dims = client.getRealDimensions();
     int diceCount = config.diceCount();
 
@@ -140,6 +142,9 @@ public class DiceOverlay extends Overlay {
       int i = 0;
 
       for (Dice dice : dices) {
+
+        dice.next(dices);
+
         BufferedImage sprite = getSprite(dice.col, dice.row, 16, 16);
 
         if (!config.flashResults() || (config.flashResults() && dice.life > 0)
@@ -192,9 +197,7 @@ public class DiceOverlay extends Overlay {
           }
         }
 
-        dice.next(dices);
-
-        if(dice.life > 0) {
+        if(dice.life > 0 || dice.result == -1) {
           allDiceDead = false;
           allDiceFallen = false;
         } else {
@@ -215,6 +218,11 @@ public class DiceOverlay extends Overlay {
 
       if (allDiceDead) {
         putAwayTimer--;
+
+        if(unannounced) {
+          unannounced = false;
+          plugin.sayTotal(dices);
+        }
       }
 
       if (config.autoPutAway() && allDiceDead && allDiceFallen) {
