@@ -18,7 +18,7 @@ Fulfill your roleplay needs or play as a "Diceman mode" account!
 
 ## Screenshots
 ![Image showing demo of dice animation](basic-dice-anim.gif)
-> *Basic dice, the player has made them white*
+> *Basic dice, the player has made them white. This loops one roll, the animations are different each roll!*
 
 ![Image showing demo of dice animation](advanced-dice.png)
 > *Advanced dice, the player has established several D10s D20s and D50s in a special colour scheme!*
