@@ -63,7 +63,7 @@ public interface DiceConfig extends Config {
 
   @ConfigItem(position = 9, keyName = "diceDigitColor", name = "Dice Digit Color", description = "The color of the dice digits if using Advanced Notation.")
   default Color diceDigitColor() {
-    return new Color(0, 0, 0);
+    return new Color(255, 255, 255);
   }
 
 }
