@@ -23,3 +23,6 @@ Fulfill your roleplay needs or play as a "Diceman mode" account!
 
 ![Image showing demo of dice animation](advanced-dice.png)
 > *Advanced dice, the player has established several D10s D20s and D50s in a special colour scheme!*
+
+## Asset Credits
+Original dice sprites from [Kicked-in-teeth @ itch.io](https://kicked-in-teeth.itch.io/dice-roll), these have been modified for purposes of the mod.
