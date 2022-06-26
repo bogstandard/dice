@@ -35,6 +35,7 @@ public class DicePlugin extends Plugin {
 
   public boolean ROLL_DICE = false;
   private Widget button = null;
+  private Widget parent = null;
 
   @Override
   protected void startUp() throws Exception {
@@ -99,11 +100,16 @@ public class DicePlugin extends Plugin {
     }
 
     button.setHidden(true);
+    try {
+      parent.getChildren()[button.getIndex()] = null;
+    } catch (NullPointerException e) {
+      // .. this shouldn't happen, but catch just incase.
+    }
     button = null;
   }
 
   private void createButton() {
-    Widget parent = client.getWidget(WidgetInfo.EQUIPMENT);
+    parent = client.getWidget(WidgetInfo.EQUIPMENT);
     if (parent == null) {
       return;
     }
