@@ -13,6 +13,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -80,6 +81,9 @@ public class DicePlugin extends Plugin {
     int total = 0;
     String message = "";
     int i = 0;
+
+    dices.sort(Comparator.comparing(Dice::getX));
+
     for (Dice dice : dices) {
       total += dice.result;
       message = message + dice.result;
