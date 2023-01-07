@@ -47,6 +47,10 @@ class Dice {
     this.magicSides = magicSides;
   }
 
+  public int getX() {
+    return this.x;
+  }
+
   // drifts dice to mimic movement
   private void drift() {
     if (x < 0 || x > canvasWidth - 32) {
