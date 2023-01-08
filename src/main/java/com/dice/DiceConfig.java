@@ -38,7 +38,7 @@ public interface DiceConfig extends Config {
 
   @ConfigItem(section = AppearanceSettings, position = 3, keyName = "diceColor", name = "Dice Color", description = "The color of the dice.")
   default Color diceColor() {
-    return new Color(255, 205, 55);
+    return new Color(240, 231, 186);
   }
 
   @ConfigItem(section = AppearanceSettings, position = 5, keyName = "autoPutAway", name = "Auto tidy", description = "Put away dice after a few moments automatically?")
