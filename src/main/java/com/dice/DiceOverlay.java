@@ -107,6 +107,7 @@ public class DiceOverlay extends Overlay {
           DiceType diceType = entry.getKey();
           Boolean diceActive = entry.getValue();
           if (!diceActive) continue;
+          if (diceCount <= 0) break;
 
           dices.add(new Dice(diceType, dims.width, dims.height, 0));
           diceCount--;
