@@ -7,7 +7,7 @@ Fulfill your roleplay needs or play as a "Diceman mode" account!
 ## Features
   - On screen **animated** dice of any amount, colour and type (eg. D6, D10, D20 etc)!<br>
     (To use advanced dice, put what you want in the "advanced notation" box seperated by spaces like `D10 D20 D100`.)
-  - Skill, Combat Skill, Fishing and Jester dice, using authentic in-game sprites!
+  - Skill, Combat Skill, Fishing, Metals and Jester dice, using authentic in-game sprites! (eg. "you rolled Gold + Silver + Trout")
   - Animation is different **every time**.
   - Change the colour of the dice.
   - Change the colour of dice text.
