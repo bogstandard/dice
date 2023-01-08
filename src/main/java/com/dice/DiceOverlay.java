@@ -2,7 +2,6 @@ package com.dice;
 
 import javax.inject.Inject;
 
-import jdk.internal.jline.internal.Log;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.client.game.ItemManager;
@@ -18,8 +17,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import static java.util.Map.entry;
 
 import net.runelite.client.ui.FontManager;
 
@@ -230,7 +227,6 @@ public class DiceOverlay extends Overlay {
 
       boolean allDiceDead = true;
       boolean allDiceFallen = true;
-      int i = 0;
 
       for (Dice dice : dices) {
 
@@ -332,8 +328,6 @@ public class DiceOverlay extends Overlay {
             allDiceFallen = false;
           }
         }
-
-        i++;
       }
 
       if (allDiceDead) {

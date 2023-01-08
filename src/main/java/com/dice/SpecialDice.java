@@ -1,8 +1,6 @@
 package com.dice;
 
-import com.google.common.collect.ImmutableMap;
 import lombok.Getter;
-import net.runelite.api.Item;
 import net.runelite.api.ItemID;
 import net.runelite.api.Skill;
 
@@ -84,8 +82,6 @@ public enum SpecialDice
     SKILL_FARMING(DiceType.SKILLS, "Farming", Skill.FARMING),
     SKILL_HUNTER(DiceType.SKILLS, "Hunter", Skill.HUNTER),
     SKILL_CONSTRUCTION(DiceType.SKILLS, "Construction", Skill.CONSTRUCTION),
-
-
     ;
 
     private final DiceType diceType;
