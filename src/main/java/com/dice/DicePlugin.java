@@ -82,6 +82,8 @@ public class DicePlugin extends Plugin {
     String message = "";
     int i = 0;
 
+    boolean containsNonNumeric = false;
+
     dices.sort(Comparator.comparing(Dice::getX));
 
     for (Dice dice : dices) {
@@ -90,8 +92,8 @@ public class DicePlugin extends Plugin {
       if (dice.diceType == DiceType.BASIC || dice.diceType == DiceType.MAGIC) {
         message = message + dice.result;
       } else {
+        containsNonNumeric = true;
         message = message + dice.specialOutcomes.get(dice.result - 1).getName();
-        total = 0;
       }
 
       if(i < dices.size() - 1) {
@@ -99,6 +101,10 @@ public class DicePlugin extends Plugin {
       }
 
       i++;
+    }
+
+    if (containsNonNumeric) {
+      total = 0;
     }
 
     client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "You rolled " + (total > 0 ? total : "") + " (" + message + ")", null);

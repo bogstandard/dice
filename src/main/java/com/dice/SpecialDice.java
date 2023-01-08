@@ -2,7 +2,10 @@ package com.dice;
 
 import com.google.common.collect.ImmutableMap;
 import lombok.Getter;
+import net.runelite.api.Item;
 import net.runelite.api.ItemID;
+import net.runelite.api.Skill;
+
 
 import java.util.Map;
 
@@ -48,16 +51,61 @@ public enum SpecialDice
     ADAMANTITE_BAR(DiceType.METALS, "Adamant", ItemID.ADAMANTITE_BAR),
     RUNITE_BAR(DiceType.METALS, "Rune", ItemID.RUNITE_BAR),
     PERFECT_GOLD_BAR(DiceType.METALS, "Perfect Gold", ItemID.PERFECT_GOLD_BAR),
+
+
+    // COMBAT SKILLS
+    COMBAT_SKILL_ATTACK(DiceType.COMBAT_SKILLS, "Attack", Skill.ATTACK),
+    COMBAT_SKILL_STRENGTH(DiceType.COMBAT_SKILLS, "Strength", Skill.STRENGTH),
+    COMBAT_SKILL_DEFENCE(DiceType.COMBAT_SKILLS, "Defence", Skill.DEFENCE),
+    COMBAT_SKILL_RANGED(DiceType.COMBAT_SKILLS, "Ranged", Skill.RANGED),
+    COMBAT_SKILL_MAGIC(DiceType.COMBAT_SKILLS, "Magic", Skill.MAGIC),
+
+    // SKILLS
+    SKILL_ATTACK(DiceType.SKILLS, "Attack", Skill.ATTACK),
+    SKILL_STRENGTH(DiceType.SKILLS, "Strength", Skill.STRENGTH),
+    SKILL_DEFENCE(DiceType.SKILLS, "Defence", Skill.DEFENCE),
+    SKILL_RANGED(DiceType.SKILLS, "Ranged", Skill.RANGED),
+    SKILL_PRAYER(DiceType.SKILLS, "Prayer", Skill.PRAYER),
+    SKILL_MAGIC(DiceType.SKILLS, "Magic", Skill.MAGIC),
+    SKILL_HITPOINTS(DiceType.SKILLS, "Hitpoints", Skill.HITPOINTS),
+    SKILL_AGILITY(DiceType.SKILLS, "Agility", Skill.AGILITY),
+    SKILL_HERBLORE(DiceType.SKILLS, "Herblore", Skill.HERBLORE),
+    SKILL_THIEVING(DiceType.SKILLS, "Thieving", Skill.THIEVING),
+    SKILL_CRAFTING(DiceType.SKILLS, "Crafting", Skill.CRAFTING),
+    SKILL_FLETCHING(DiceType.SKILLS, "Fletching", Skill.FLETCHING),
+    SKILL_MINING(DiceType.SKILLS, "Mining", Skill.MINING),
+    SKILL_SMITHING(DiceType.SKILLS, "Smithing", Skill.SMITHING),
+    SKILL_FISHING(DiceType.SKILLS, "Fishing", Skill.FISHING),
+    SKILL_COOKING(DiceType.SKILLS, "Cooking", Skill.COOKING),
+    SKILL_FIREMAKING(DiceType.SKILLS, "Firemaking", Skill.FIREMAKING),
+    SKILL_WOODCUTTING(DiceType.SKILLS, "Woodcutting", Skill.WOODCUTTING),
+    SKILL_RUNECRAFT(DiceType.SKILLS, "Runecraft", Skill.RUNECRAFT),
+    SKILL_SLAYER(DiceType.SKILLS, "Slayer", Skill.SLAYER),
+    SKILL_FARMING(DiceType.SKILLS, "Farming", Skill.FARMING),
+    SKILL_HUNTER(DiceType.SKILLS, "Hunter", Skill.HUNTER),
+    SKILL_CONSTRUCTION(DiceType.SKILLS, "Construction", Skill.CONSTRUCTION),
+
+
     ;
 
     private final DiceType diceType;
     private final String name;
     private final int specialSpriteId;
+    private final Skill specialSkill;
 
     SpecialDice(DiceType diceType, String name, int specialSpriteId)
     {
         this.diceType = diceType;
         this.name = name;
         this.specialSpriteId = specialSpriteId;
+        this.specialSkill = null;
+    }
+
+    SpecialDice(DiceType diceType, String name, Skill specialSkill)
+    {
+        this.diceType = diceType;
+        this.name = name;
+        this.specialSpriteId = 0;
+        this.specialSkill = specialSkill;
     }
 }

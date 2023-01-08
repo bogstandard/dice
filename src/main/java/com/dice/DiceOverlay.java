@@ -2,9 +2,11 @@ package com.dice;
 
 import javax.inject.Inject;
 
+import jdk.internal.jline.internal.Log;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.game.SkillIconManager;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -12,8 +14,13 @@ import net.runelite.client.util.ImageUtil;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
+import static java.util.Map.entry;
+
 import net.runelite.client.ui.FontManager;
 
 @Slf4j
@@ -24,6 +31,7 @@ public class DiceOverlay extends Overlay {
   private final DicePlugin plugin;
   private final DiceConfig config;
   private final ItemManager itemManager;
+  private final SkillIconManager iconManager;
 
   // relatively unchanging
   private BufferedImage spritesheet;
@@ -40,7 +48,7 @@ public class DiceOverlay extends Overlay {
   private int putAwayTimer;
 
   @Inject
-  DiceOverlay(Client client, DicePlugin plugin, DiceConfig config, ItemManager itemManager) {
+  DiceOverlay(Client client, DicePlugin plugin, DiceConfig config, ItemManager itemManager, SkillIconManager iconManager) {
     super(plugin);
     setPosition(OverlayPosition.DYNAMIC);
     setLayer(OverlayLayer.ALWAYS_ON_TOP);
@@ -48,6 +56,7 @@ public class DiceOverlay extends Overlay {
     this.client = client;
     this.config = config;
     this.itemManager = itemManager;
+    this.iconManager = iconManager;
     spritesheet = ImageUtil.loadImageResource(DicePlugin.class, "/spritesheet.png");
     font = FontManager.getRunescapeBoldFont();
     fontSmall = FontManager.getRunescapeSmallFont();
@@ -74,20 +83,36 @@ public class DiceOverlay extends Overlay {
     dims = client.getRealDimensions();
     int diceCount = config.diceCount();
 
-    if (config.fishingDice()) {
-      for (int i = 0; i < diceCount; i++) {
-        dices.add(new Dice(DiceType.FISHING, dims.width, dims.height, 0));
+    int specialsActive = countTrue(
+            config.basicDice(),
+            config.fishingDice(),
+            config.jesterDice(),
+            config.metalDice(),
+            config.combatSkillDice(),
+            config.skillDice()
+    );
+
+    if (specialsActive > 0) {
+      Map<DiceType, Boolean> specialDiceMap = new HashMap<DiceType, Boolean>(){{
+        put(DiceType.BASIC, config.basicDice());
+        put(DiceType.FISHING, config.fishingDice());
+        put(DiceType.JESTER, config.jesterDice());
+        put(DiceType.METALS, config.metalDice());
+        put(DiceType.COMBAT_SKILLS, config.combatSkillDice());
+        put(DiceType.SKILLS, config.skillDice());
+      }};
+
+      while (diceCount > 0) {
+        for (Map.Entry<DiceType, Boolean> entry : specialDiceMap.entrySet()) {
+          DiceType diceType = entry.getKey();
+          Boolean diceActive = entry.getValue();
+          if (!diceActive) continue;
+
+          dices.add(new Dice(diceType, dims.width, dims.height, 0));
+          diceCount--;
+        }
       }
-    }
-    else if (config.jesterDice()) {
-      for (int i = 0; i < diceCount; i++) {
-        dices.add(new Dice(DiceType.JESTER, dims.width, dims.height, 0));
-      }
-    }
-    else if (config.metalDice()) {
-      for (int i = 0; i < diceCount; i++) {
-        dices.add(new Dice(DiceType.METALS, dims.width, dims.height, 0));
-      }
+
     }
     else if (config.diceAdvancedNotation().length() > 0) {
       String[] notation = config.diceAdvancedNotation().split("\\s+");
@@ -104,6 +129,17 @@ public class DiceOverlay extends Overlay {
         dices.add(new Dice(DiceType.BASIC, dims.width, dims.height, 0));
       }
     }
+  }
+
+  /**
+   * Count trues of given args
+   */
+  protected int countTrue(boolean... vars) {
+    int count = 0;
+    for (boolean var : vars) {
+      count += (var ? 1 : 0);
+    }
+    return count;
   }
 
   /**
@@ -163,6 +199,20 @@ public class DiceOverlay extends Overlay {
   }
 
   /**
+   * Resize a given sprite
+   */
+  public static BufferedImage resize(BufferedImage sprite, int newW, int newH) {
+    Image tmp = sprite.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
+    BufferedImage newSprite = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
+
+    Graphics2D g2d = newSprite.createGraphics();
+    g2d.drawImage(tmp, 0, 0, null);
+    g2d.dispose();
+
+    return newSprite;
+  }
+
+  /**
    * Draw a String centered in the middle of a Rectangle.
    */
   public void drawCenteredString(Graphics g, String text, Dice dice, int offsetx, int offsety) {
@@ -208,9 +258,21 @@ public class DiceOverlay extends Overlay {
         // draw special sides result on dice
         if (dice.life <= 0 && dice.magicSides > 0 && dice.diceType != DiceType.BASIC && dice.diceType != DiceType.MAGIC) {
           if (dice.result > 0) { // prevent flash of -1 sprite (we subtract later)
-            BufferedImage spriteImage = itemManager.getImage(dice.specialOutcomes.get(dice.result - 1).getSpecialSpriteId());
-            spriteImage = alpha(((float)config.diceOpacity() / 100), spriteImage);
-            g.drawImage(spriteImage, dice.x, dice.y, 32, 32, null);
+
+            BufferedImage spriteImage = null;
+
+            if (dice.specialOutcomes.get(dice.result - 1).getSpecialSpriteId() > 0) {
+              spriteImage = itemManager.getImage(dice.specialOutcomes.get(dice.result - 1).getSpecialSpriteId());
+            }
+            else if (dice.specialOutcomes.get(dice.result - 1).getSpecialSkill() != null) {
+              spriteImage = iconManager.getSkillImage(dice.specialOutcomes.get(dice.result - 1).getSpecialSkill());
+            }
+
+            if (spriteImage != null) {
+              spriteImage = alpha(((float) config.diceOpacity() / 100), spriteImage);
+              spriteImage = resize(spriteImage, 24, 24);
+              g.drawImage(spriteImage, dice.x + 4, dice.y + 4, 24, 24, null);
+            }
           }
         }
         // draw magic sides result on dice

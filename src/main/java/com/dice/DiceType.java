@@ -6,4 +6,6 @@ public enum DiceType {
     FISHING,
     JESTER,
     METALS,
+    COMBAT_SKILLS,
+    SKILLS,
 }
