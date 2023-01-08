@@ -86,7 +86,13 @@ public class DicePlugin extends Plugin {
 
     for (Dice dice : dices) {
       total += dice.result;
-      message = message + dice.result;
+
+      if (dice.diceType == DiceType.BASIC || dice.diceType == DiceType.MAGIC) {
+        message = message + dice.result;
+      } else {
+        message = message + dice.specialOutcomes.get(dice.result - 1).getName();
+        total = 0;
+      }
 
       if(i < dices.size() - 1) {
         message = message + " + ";
@@ -95,7 +101,7 @@ public class DicePlugin extends Plugin {
       i++;
     }
 
-    client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "You rolled " + total + " (" + message + ")", null);
+    client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "You rolled " + (total > 0 ? total : "") + " (" + message + ")", null);
   }
 
   private void hideButton() {

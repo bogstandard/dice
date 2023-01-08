@@ -33,7 +33,7 @@ public interface DiceConfig extends Config {
 
   @ConfigItem(position = 3, keyName = "diceColor", name = "Dice Color", description = "The color of the dice.")
   default Color diceColor() {
-    return new Color(255, 205, 55);
+    return new Color(255, 255, 255);
   }
 
 
@@ -66,4 +66,12 @@ public interface DiceConfig extends Config {
     return new Color(255, 255, 255);
   }
 
+  @ConfigItem(position = 10, keyName = "fishingDice", name = "Fishing Dice (D19)", description = "Use fishing dice?")
+  default boolean fishingDice() { return false; }
+
+  @ConfigItem(position = 11, keyName = "jesterDice", name = "Jester Dice (D6)", description = "Use jester dice?")
+  default boolean jesterDice() { return false; }
+
+  @ConfigItem(position = 12, keyName = "metalDice", name = "Metal Dice (D9)", description = "Use metal dice?")
+  default boolean metalDice() { return false; }
 }
