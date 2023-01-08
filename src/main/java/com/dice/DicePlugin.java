@@ -82,11 +82,19 @@ public class DicePlugin extends Plugin {
     String message = "";
     int i = 0;
 
+    boolean containsNonNumeric = false;
+
     dices.sort(Comparator.comparing(Dice::getX));
 
     for (Dice dice : dices) {
       total += dice.result;
-      message = message + dice.result;
+
+      if (dice.diceType == DiceType.BASIC || dice.diceType == DiceType.MAGIC) {
+        message = message + dice.result;
+      } else {
+        containsNonNumeric = true;
+        message = message + dice.specialOutcomes.get(dice.result - 1).getName();
+      }
 
       if(i < dices.size() - 1) {
         message = message + " + ";
@@ -95,7 +103,11 @@ public class DicePlugin extends Plugin {
       i++;
     }
 
-    client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "You rolled " + total + " (" + message + ")", null);
+    if (containsNonNumeric) {
+      total = 0;
+    }
+
+    client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "You rolled " + (total > 0 ? total : "") + " (" + message + ")", null);
   }
 
   private void hideButton() {

@@ -1,11 +1,13 @@
 package com.dice;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 class Dice {
   private Random r;
 
+  DiceType diceType;
   int x;
   int y;
   int life;
@@ -25,10 +27,13 @@ class Dice {
   int canvasHeight;
   boolean altFrame = false;
   int magicSides;
+  List<SpecialDice> specialOutcomes;
+
   int result = -1;
   boolean dead = false;
 
-  public Dice(int canvasWidth, int canvasHeight, int magicSides) {
+  public Dice(DiceType diceType, int canvasWidth, int canvasHeight, int magicSides) {
+    this.diceType = diceType;
     this.r = new Random();
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;
@@ -45,6 +50,18 @@ class Dice {
     this.xDrift = -15 + r.nextInt(1 - -15 + 1);
     this.yDrift = -15 + r.nextInt(1 - -15 + 1);
     this.magicSides = magicSides;
+
+    // if it's a special dice, then affect the magicSides count to save code
+    this.specialOutcomes = new ArrayList<>();
+    if (this.diceType != DiceType.BASIC && this.diceType != DiceType.MAGIC) {
+      for (SpecialDice sp: SpecialDice.values()) {
+        if (sp.getDiceType() == this.diceType) {
+          this.specialOutcomes.add(sp);
+        }
+      }
+
+      this.magicSides = this.specialOutcomes.size();
+    }
   }
 
   public int getX() {
@@ -104,14 +121,14 @@ class Dice {
         }
       } else {
         ticks = speed * 2; // slow things down now
-        if(this.magicSides > 0) {  // its a magic dice..
+        if (this.magicSides > 0 && this.diceType != DiceType.BASIC) {  // its not a basic dice, use a blank base
           row = 13;
           col = 1;
-          if(result == -1) {
+          if (result == -1) {
             result = 1 + r.nextInt(magicSides - 1 + 1);
           }
         } else {
-          row = 1; // its a normal dice..
+          row = 1; // its a normal dice use a dotted base..
           result = col;
         }
       }
