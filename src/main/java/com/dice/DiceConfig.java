@@ -51,7 +51,7 @@ public interface DiceConfig extends Config {
   }
 
   @ConfigItem(section = AppearanceSettings, position = 7, keyName = "labelDice", name = "Label Dice", description = "Show labels next to each dice?")
-  default boolean labelDice() { return false; }
+  default boolean labelDice() { return true; }
 
   @ConfigItem(section = AppearanceSettings, position = 8, keyName = "diceDigitColor", name = "Dice Digit Color", description = "The color of the dice digits if using Advanced Notation.")
   default Color diceDigitColor() {
