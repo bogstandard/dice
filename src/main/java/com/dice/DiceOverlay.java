@@ -39,7 +39,6 @@ public class DiceOverlay extends Overlay {
   private Font font;
   private Font fontSmall;
   Dimension dims;
-  Color[] colors = new Color[]{Color.WHITE, Color.ORANGE, Color.RED, Color.BLUE, Color.GREEN};
 
   // changing
   private final List<Dice> dices = new LinkedList<>();
@@ -240,10 +239,6 @@ public class DiceOverlay extends Overlay {
         BufferedImage sprite = getSprite(dice.col, dice.row, 16, 16);
 
         Color tint = config.diceColor();
-
-        if(config.autoColorDice()) {
-          tint = colors[i % colors.length];
-        }
 
         float tintR = (tint.getRed() / 255.0f);
         float tintG = (tint.getGreen() / 255.0f);

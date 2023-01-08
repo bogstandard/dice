@@ -41,10 +41,6 @@ public interface DiceConfig extends Config {
     return new Color(255, 205, 55);
   }
 
-
-  @ConfigItem(section = AppearanceSettings, position = 4, keyName = "autoColorDice", name = "Auto Color Dice", description = "Let the system color the dice differently?")
-  default boolean autoColorDice() { return false; }
-
   @ConfigItem(section = AppearanceSettings, position = 5, keyName = "autoPutAway", name = "Auto tidy", description = "Put away dice after a few moments automatically?")
   default boolean autoPutAway() { return true; }
 
